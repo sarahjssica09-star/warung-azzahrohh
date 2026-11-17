@@ -1,0 +1,3 @@
+<?php
+require_once __DIR__ . '/../_common.php';api_require_role('fo');
+try{$id=(int)$_SESSION['id_akun'];$s=$conn->prepare("SELECT (SELECT COUNT(*) FROM transaksi WHERE id_user IS NOT NULL AND status_pesanan='menunggu_pembayaran') pesanan_masuk,(SELECT COUNT(*) FROM transaksi WHERE id_user IS NOT NULL AND status_pesanan IN ('diproses','dikirim')) pesanan_diproses,(SELECT COUNT(*) FROM transaksi WHERE id_fo=? AND status_pesanan='selesai') transaksi_selesai,(SELECT COALESCE(SUM(total_bayar),0) FROM transaksi WHERE id_fo=? AND status_pembayaran='berhasil') total_pendapatan");$s->bind_param('ii',$id,$id);$s->execute();$row=api_one($s);$s->close();api_reply(200,true,'Ringkasan FO berhasil diambil.',$row);}catch(Throwable $e){api_db_error($e);}
